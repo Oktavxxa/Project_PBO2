@@ -1,0 +1,101 @@
+class jadwal(noname.MyFrame9):
+    def _init_(self, parent):
+        noname.MyFrame9._init_(self, parent)
+    def tambahclick(self, event):
+        hari = self.hr.GetValue()
+        mataKuliah = self.matkul.GetValue()
+        kelas = self.kls.GetValue()
+        jamMulai = self.jamml.GetValue()
+        jamSelesai = self.jamslsi.GetValue()
+        cursor = conn.cursor()
+        sql = "INSERT INTO jadwal values('', '{}', '{}', '{}', '{}', '{}')".format(hari, mataKuliah, kelas, jamMulai, jamSelesai)
+        cursor.execute(sql)
+        conn.commit()
+        settabeljadwal()
+        print(format(cursor.rowcount))
+        wx.MessageBox('Data berhasil ditambahkan!','Information',wx.OK | wx.ICON_INFORMATION )
+    def ubahclick(self, event):
+        U=Ubah(None)
+        U.Show()
+    def hapusonclick(self, event):
+        A=Hapus(None)
+        A.Show()
+    def kembaliclick( self, event ):
+        K1=M4(None)
+        K1.Show()
+        self.Hide()
+
+class Ubah(noname.MyFrame10):
+    def _init_(self, parent):
+        noname.MyFrame10._init_(self, parent)
+    def cari1OnButtonClick( self, event ):
+        a = str(self.iID.GetValue())
+        sql= "select * from jadwal where id='{}'".format(a)
+        cursor.execute(sql)
+        id=cursor.fetchall()[0]
+        self.iHari.SetValue(str(id[1]))
+        self.iM.SetValue(str(id[2]))
+        self.iK.SetValue(str(id[3]))
+        self.iJM.SetValue(str(id[4]))
+        self.iJS.SetValue(str(id[5]))
+    def ubah1OnButtonClick(self, event ):
+        id = self.iID.GetValue()
+        hari = self.iHari.GetValue()
+        matkul = self.iM.GetValue()
+        kelas = self.iK.GetValue()
+        jamMulai = self.iJM.GetValue()
+        jamSelesai = self.iJS.GetValue()
+        sql = "UPDATE jadwal SET hari='"+hari+"',  matkul='"+matkul+"', kelas='"+kelas+"', JamMulai='"+jamMulai+"', JamSelesai='"+jamSelesai+"' WHERE id="+id+"" 
+        cursor = conn.cursor()
+        cursor.execute(sql)
+        conn.commit()
+        settabeljadwal()
+        wx.MessageBox('Data berhasil diubah!','Information',wx.OK | wx.ICON_INFORMATION )
+    def k1OnButtonClick( self, event ):
+        self.Hide()
+
+class Hapus(noname.MyFrame11):
+    def _init_(self, parent):
+        noname.MyFrame11._init_(self, parent)
+    def carionclick(self, event):
+        b = str(self.in_id.GetValue())
+        sql= "select * from jadwal where id='{}'".format(b)
+        cursor.execute(sql)
+        id=cursor.fetchall()[0]
+        self.in_hr.SetValue(str(id[1]))
+        self.in_matkul.SetValue(str(id[2]))
+        self.in_kls.SetValue(str(id[3]))
+        self.in_jammli.SetValue(str(id[4]))
+        self.in_jamslsi.SetValue(str(id[5]))
+    def hapusonclick(self, event):
+        try :
+            c = str(self.in_id.GetValue())
+            cursor = conn.cursor()
+            sql = "DELETE FROM jadwal WHERE id='{}'".format(c)
+            cursor.execute(sql)
+            conn.commit()
+            settabeljadwal()
+            print("{} Data Berhasil Dihapus".format(cursor.rowcount))
+            wx.MessageBox('Data berhasil dihapus!','Information',wx.OK | wx.ICON_INFORMATION )
+        except mysql.connector.Error as e:
+            print("Gagal Hapus Data : {}".format(e))
+    def k2OnButtonClick( self, event ):
+        self.Hide()
+        
+    f0=jadwal(parent=None)
+    def settabeljadwal():
+        while True:
+            try:
+                f0.listjadwal.DeleteRows(1)
+            except:
+                break
+        cursor.execute("SELECT hari, matkul, kelas, jamMulai, jamSelesai FROM jadwal")
+        result = cursor.fetchall()
+        for indexbaris,baris in enumerate(result):
+            f0.listjadwal.AppendRows(1)
+            for indexkolom,kolom in enumerate(baris):
+                try:
+                    f0.listjadwal.SetCellValue(indexbaris,indexkolom,str(kolom))
+                except:
+                    pass
+    settabeljadwal()
