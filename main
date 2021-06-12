@@ -85,7 +85,83 @@ class M4(noname.MyFrame4):
         U=M3(None)
         U.Show()
         self.Hide()
+        
+class mulai(noname.MyFrame6):
+    def _init_(self, parent):
+        noname.MyFrame6._init_(self, parent)
+    def tambahClick(self, event):
+        matKul=self.iMatkul.GetValue()
+        jam=self.iJam.GetValue()
+        ket=self.iKet.GetValue()
+        cursor = conn.cursor()
+        sql = "INSERT INTO tugas values('','{}','{}','{}')".format(matKul,jam,ket)
+        cursor.execute(sql)
+        conn.commit()
+        settabeltugas()
+        print(format(cursor.rowcount))
+        wx.MessageBox('Data berhasil ditambahkan!','Information',wx.OK | wx.ICON_INFORMATION )
+    def ubahClick(self, event):
+        a=ubah(None)
+        a.Show()
+    def hapusonclick(self, event):
+        b=hapus(None)
+        b.Show()
+    def k1OnButtonClick( self, event ):
+        K0=M4(None)
+        K0.Show()
+        self.Hide()
 
+class ubah(noname.MyFrame7):
+    def _init_(self, parent):
+        noname.MyFrame7._init_(self, parent) 
+    def cariClick(self, event):
+        x = str(self.iId.GetValue())
+        sql= "select * from tugas where idTugas='{}'".format(x)
+        cursor.execute(sql)
+        id=cursor.fetchall()[0]
+        self.iMK.SetValue(str(id[1]))
+        self.iD.SetValue(str(id[2]))
+        self.iKT.SetValue(str(id[3]))
+    def ubahClick(self, event):
+        id = self.iId.GetValue()
+        matkul = self.iMK.GetValue()
+        deadline = self.iD.GetValue()
+        ket = self.iKT.GetValue()
+        sql = "UPDATE tugas SET matkul='"+matkul+"',  deadline='"+deadline+"', ket='"+ket+"' WHERE idTugas="+id+"" 
+        cursor = conn.cursor()
+        cursor.execute(sql)
+        conn.commit()
+        settabeltugas()
+        wx.MessageBox('Data berhasil diubah!','Information',wx.OK | wx.ICON_INFORMATION )
+    def k2OnButtonClick( self, event ):
+        self.Hide()    
+
+class hapus(noname.MyFrame8):
+    def _init_(self, parent):
+        noname.MyFrame8._init_(self, parent)
+    def carionclick(self, event):
+        y = str(self.i_id.GetValue())
+        sql= "select * from tugas where idTugas='{}'".format(y)
+        cursor.execute(sql)
+        id=cursor.fetchall()[0]
+        self.i_m.SetValue(str(id[1]))
+        self.i_d.SetValue(str(id[2]))
+        self.i_k.SetValue(str(id[3]))       
+    def hapusonclick(self, event):
+        try :
+            z = str(self.i_id.GetValue())
+            cursor = conn.cursor()
+            sql = "DELETE FROM tugas WHERE idTugas='{}'".format(z)
+            cursor.execute(sql)
+            conn.commit()
+            settabeltugas()
+            print("{} Data Berhasil Dihapus".format(cursor.rowcount))
+            wx.MessageBox('Data berhasil dihapus!','Information',wx.OK | wx.ICON_INFORMATION )
+        except mysql.connector.Error as e:
+            print("Gagal Hapus Data : {}".format(e))
+    def k3OnButtonClick( self, event ):
+        self.Hide()
+        
 class jadwal(noname.MyFrame9):
     def _init_(self, parent):
         noname.MyFrame9._init_(self, parent)
@@ -169,6 +245,24 @@ class Hapus(noname.MyFrame11):
             print("Gagal Hapus Data : {}".format(e))
     def k2OnButtonClick( self, event ):
         self.Hide()
+       
+    f2=mulai(parent=None)
+    def settabeltugas():
+        while True:
+            try:
+                f2.listtugas.DeleteRows(1)
+            except:
+                break
+        cursor.execute("SELECT matkul, deadline, ket FROM tugas")
+        result = cursor.fetchall()
+        for indexbaris,baris in enumerate(result):
+            f2.listtugas.AppendRows(1)
+            for indexkolom,kolom in enumerate(baris):
+                try:
+                    f2.listtugas.SetCellValue(indexbaris,indexkolom,str(kolom))
+                except:
+                    pass
+    settabeltugas()
         
     f0=jadwal(parent=None)
     def settabeljadwal():
