@@ -1,3 +1,91 @@
+import wx
+from wx.core import NO, PasswordEntryDialog, Window
+import noname
+import mysql.connector
+conn = mysql.connector.connect(host="localhost",port=3306,user="root",password="",database="pbo_db")
+cursor=conn.cursor()
+
+class M1(noname.MyFrame1):
+    def __init__(self, parent):
+        noname.MyFrame1.__init__(self, parent)
+    def regisOnButtonClick( self, event ):
+        query=("select Username from user")
+        dataUsername=[]
+        cursor.execute(query)
+        database_=cursor.fetchall()
+        
+        for i in database_:
+            dataUsername.append(i[0])
+
+        a = str(self.Nama.GetValue())
+        b = str(self.Username.GetValue())
+        c = str(self.Password.GetValue())
+        
+        if b in dataUsername :
+            wx.MessageBox('Username sudah terdaftar, masukkan username lain','Information',wx.OK | wx.ICON_INFORMATION )
+        elif a == '' :
+            wx.MessageBox('Masih ada data yang kosong, silahkan lengkapi terlebih dahulu','Information',wx.OK | wx.ICON_INFORMATION )
+        elif b == '' :
+            wx.MessageBox('Masih ada data yang kosong, silahkan lengkapi terlebih dahulu','Information',wx.OK | wx.ICON_INFORMATION )
+        elif c == '' :
+            wx.MessageBox('Masih ada data yang kosong, silahkan lengkapi terlebih dahulu','Information',wx.OK | wx.ICON_INFORMATION )
+        else:
+            query="Insert into user values('','{}','{}','{}')".format(a,b,c)
+            cursor.execute(query)
+            conn.commit()
+            wx.MessageBox('Selamat Anda Telah Berhasil Register, Silahkan Login!','Information',wx.OK | wx.ICON_INFORMATION )
+            L1=M2(None)
+            wx.OK=L1.Show()
+            self.Hide()
+            
+class M2(noname.MyFrame2):
+    def __init__(self, parent):
+        noname.MyFrame2.__init__(self, parent)
+    def loginOnButtonClick( self, event ):
+        a = str(self.inputUname.GetValue())
+        b = str(self.inputPass.GetValue())
+        query= "select id from user where Username='{}' and Password='{}'".format(a,b)
+        try:
+            cursor.execute(query)
+            id=cursor.fetchall()[0][0]
+            wx.MessageBox('Selamat data yang anda inputkan valid!','Information',wx.OK | wx.ICON_INFORMATION )
+            B=M4(None)
+            B.Show()
+            self.Hide()
+            return id
+        except:
+            wx.MessageBox('Data yang anda inputkan salah!','Information',wx.OK | wx.ICON_INFORMATION )
+        
+class M3(noname.MyFrame3):
+    def __init__(self, parent):
+        noname.MyFrame3.__init__(self, parent)
+    def regis1OnButtonClick( self, event ):
+        R=M1(None)
+        R.Show()
+        self.Hide()
+
+    def login1OnButtonClick( self, event ):
+        L=M2(None)
+        L.Show()
+        self.Hide()
+
+class M4(noname.MyFrame4):
+    def __init__(self, parent):
+        noname.MyFrame4.__init__(self, parent)
+
+    def jadwalBOnButtonClick( self, event ):
+        f0.Show()
+        self.Hide()
+
+    def TugasBOnButtonClick( self, event ):
+        f2.Show()
+        self.Hide()
+
+    def AkunBOnButtonClick( self, event ):
+        U=M3(None)
+        U.Show()
+        self.Hide()
+
 class jadwal(noname.MyFrame9):
     def _init_(self, parent):
         noname.MyFrame9._init_(self, parent)
@@ -99,3 +187,8 @@ class Hapus(noname.MyFrame11):
                 except:
                     pass
     settabeljadwal()
+    
+app = wx.App()
+frame = M3(None)    
+frame.Show()
+app.MainLoop()
